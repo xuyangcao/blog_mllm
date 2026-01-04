@@ -27,7 +27,7 @@
 ## 📚 内容目录
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 :caption: 第一部分：基础理论与背景
 
 intro/llm_overview
@@ -36,7 +36,7 @@ intro/multimodal_basics
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 :caption: 第二部分：核心模型架构
 
 architecture/transformer
@@ -46,7 +46,7 @@ architecture/mllm_arch
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 :caption: 第三部分：训练方法与优化
 
 training/data_preparation
@@ -57,7 +57,7 @@ training/inference
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 :caption: 第四部分：多模态应用与实战
 
 applications/image_text
@@ -68,7 +68,7 @@ applications/trends
 ```
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 :caption: 附录
 
 appendix/python_pytorch
