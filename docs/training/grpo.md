@@ -245,8 +245,8 @@ optimizer.step()
 
 ## 参考资料
 
-1. DeepSeekMath: Pushing the Limits of Mathematical
-Reasoning in Open Language Models.(https://arxiv.org/pdf/2402.03300)
+1. [DeepSeekMath: Pushing the Limits of Mathematical
+Reasoning in Open Language Models](https://arxiv.org/pdf/2402.03300)
 2. https://swift.readthedocs.io/zh-cn/latest/Instruction/GRPO/GetStarted/GRPO.html
 3. Qwen & ChatGPT
 
