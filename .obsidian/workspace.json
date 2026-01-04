@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "bcd727882e0f4c42",
+        "id": "15adb6d68357d5b3",
         "type": "tabs",
         "children": [
           {
-            "id": "d31fd799f542ce55",
+            "id": "c1780c22ab0e149b",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -176,8 +176,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "d31fd799f542ce55",
+  "active": "c1780c22ab0e149b",
   "lastOpenFiles": [
+    "docs/index.md",
+    "docs/dist/data_parallel.md",
+    "docs/transformer/rope.md",
     "README.md",
     "mkdocs.yml",
     "Untitled.md"

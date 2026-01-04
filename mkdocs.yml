@@ -11,19 +11,11 @@ theme:
     - navigation.top
     - content.code.copy
     - content.math
+  color_mode: dark
   highlightjs: true
   hljs_languages:
     - yaml
     - rust
-    - python
-    - javascript
-    - html
-    - css
-    - json
-    - markdown
-    - sql
-    - bash
-    - shell
 
 markdown_extensions:
   - admonition
