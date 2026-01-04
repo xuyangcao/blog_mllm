@@ -55,9 +55,9 @@ $$
 因此，我们的目标是：通过调整 $\theta$，让这个期望收益尽可能大。
 
 > 注：在实际训练中，为了兼容基于梯度下降的优化框架，通常做法是最小化其负值，即定义：
-> $$
-> \mathcal{L}_{\text{GRPO}}(\theta) = -\mathcal{J}_{\text{GRPO}}(\theta)
-> $$
+>
+> $$\mathcal{L}_{\text{GRPO}}(\theta) = -\mathcal{J}_{\text{GRPO}}(\theta)$$
+>
 > 并对 $\mathcal{L}_{\text{GRPO}}(\theta)$ 执行梯度下降。
 
 
@@ -78,17 +78,13 @@ $\{o_i\}_{i=1}^G$表示对同一个 $q$，用旧策略 $\pi_{\theta_{\text{old}}
 
 > 这里我们通过监督学习来做个类比，监督学习的目标函数如下：
 >
-> $$
-> \mathcal{L}(\theta) = \mathbb{E}_{(x, y) \sim \mathcal{D}} \left[ \text{CrossEntropy}(f_\theta(x), y) \right]
-> $$
+> $$\mathcal{L}(\theta) = \mathbb{E}_{(x, y) \sim \mathcal{D}} \left[ \text{CrossEntropy}(f_\theta(x), y) \right]$$
 >
->其中$\mathcal{D}$表示训练数据分布，$(x, y)$表示一条样本（如图像+标签），CrossEntropy表示对这条样本计算的 loss。那么这个公式的整体含义可以表示为：在所有可能的数据上，模型预测的平均交叉熵损失。
+> 其中$\mathcal{D}$表示训练数据分布，$(x, y)$表示一条样本（如图像+标签），CrossEntropy表示对这条样本计算的 loss。那么这个公式的整体含义可以表示为：在所有可能的数据上，模型预测的平均交叉熵损失。
 >
->但我们无法计算真实期望（因为 $\mathcal{D}$ 未知），所以用 **Monte Carlo 估计**（即 mini-batch）：
+> 但我们无法计算真实期望（因为 $\mathcal{D}$ 未知），所以用 **Monte Carlo 估计**（即 mini-batch）：
 >
-> $$
-> \hat{\mathcal{L}}(\theta) \approx \frac{1}{N} \sum_{i=1}^N \text{CrossEntropy}(f_\theta(x_i), y_i)
-> $$
+> $$\hat{\mathcal{L}}(\theta) \approx \frac{1}{N} \sum_{i=1}^N \text{CrossEntropy}(f_\theta(x_i), y_i)$$
 >
 > 也就是说，`期望 = 理论目标，求和 = 实际近似`。回到 GRPO,完全一样的逻辑,对应关系如下：
 >

@@ -1,0 +1,94 @@
+/* 引用块样式 - Blockquote */
+blockquote {
+    background-color: #f8f9fa;
+    border-left: 4px solid #2980b9;
+    margin: 1.5em 0;
+    padding: 1em 1.5em;
+    font-style: normal;
+    color: #555;
+    overflow-x: auto;
+}
+
+blockquote p {
+    margin: 0.5em 0;
+}
+
+blockquote p:first-child {
+    margin-top: 0;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* 块级公式容器样式 - 只对 display math 应用，不影响行内公式 */
+mjx-container[display="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    padding: 0.5em 0;
+    display: block;
+}
+
+/* 块级公式的父容器 */
+div.math {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* 行内公式保持 inline 显示 */
+mjx-container:not([display="true"]) {
+    display: inline;
+    overflow: visible;
+}
+
+/* 表格样式优化 */
+table.docutils {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+table.docutils th,
+table.docutils td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+table.docutils th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+table.docutils tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* 代码块样式 */
+div.highlight pre {
+    border-radius: 4px;
+}
+
+/* 提示和警告块 */
+div.admonition {
+    margin: 1.5em 0;
+    padding: 1em;
+    border-radius: 4px;
+}
+
+div.admonition.note {
+    background-color: #e7f2fa;
+    border-left: 4px solid #2980b9;
+}
+
+div.admonition.warning {
+    background-color: #fdf3e7;
+    border-left: 4px solid #e67e22;
+}
+
+div.admonition.tip {
+    background-color: #e7f9e7;
+    border-left: 4px solid #27ae60;
+}
+
