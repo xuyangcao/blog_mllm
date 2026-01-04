@@ -72,7 +72,7 @@ $$
 其中,
 $q$表示一个 prompt（问题），从数据分布 $P(Q)$ 中采样， $P(Q)$包含了不同类型的prompt，例如医学问题，VQA、报告生成等；
 $\{o_i\}_{i=1}^G$表示对同一个 $q$，用旧策略 $\pi_{\theta_{\text{old}}}$ 生成的 **G 个输出（completions）**.
-也就是说：**对每个 prompt，我们并行生成 G 个回答，然后基于这些回答做优化**. 这就是 GRPO 的“组内对比”思想.
+也就是说：**对每个 prompt，我们并行生成 G 个回答，然后基于这些回答做优化**. 这就是 GRPO 的"组内对比"思想.
 
 进一步理解，这个期望可以表示："如果我们从真实 prompt 分布中随机挑一个 $q$，再用旧策略对它生成 $G$ 个随机回答，然后计算 GRPO loss，那么这个 loss 的平均值是多少?"，而我们的目标是：通过调整 $\theta$（当前策略），让这个期望 loss 尽可能小。"
 
@@ -249,3 +249,4 @@ optimizer.step()
 Reasoning in Open Language Models.(https://arxiv.org/pdf/2402.03300)
 2. https://swift.readthedocs.io/zh-cn/latest/Instruction/GRPO/GetStarted/GRPO.html
 3. Qwen & ChatGPT
+

@@ -22,71 +22,70 @@
 
 希望这本书能帮你少走弯路，把原理搞透。
 
-## 阅读建议
-
-每篇文章通常按以下结构组织：
-
-1. **核心思想**：一句话概括技术本质
-2. **公式回顾**：列出关键公式
-3. **深入理解**：逐项拆解公式，解释设计动机
-4. **伪代码/实现**：对照代码理解实现细节
-5. **参考资料**：论文、文档、工具链接
-
 ---
 
 ## 📚 内容目录
 
 ```{toctree}
 :maxdepth: 2
-:caption: 分布式训练
+:caption: 第一部分：基础理论与背景
 
-dist/mixed_precision
-dist/gradient_accumulation
-dist/pipeline_parallel
-dist/data_parallel
-dist/model_parallel
-dist/parallel_training_optimization
+intro/llm_overview
+intro/dl_basics
+intro/multimodal_basics
 ```
 
 ```{toctree}
 :maxdepth: 2
-:caption: Transformer
+:caption: 第二部分：核心模型架构
 
-transformer/attention
-transformer/kv_cache
-transformer/rope
-transformer/position_encoding
-transformer/self_attention
-transformer/multi_head_attention
+architecture/transformer
+architecture/llm_design
+architecture/mllm_arch
 ```
 
 ```{toctree}
 :maxdepth: 2
-:caption: 强化学习
+:caption: 第三部分：训练方法与优化
 
-RL/ppo
-RL/grpo
+training/data_preparation
+training/distributed
+training/rl_alignment
+training/grpo
+training/inference
 ```
 
 ```{toctree}
 :maxdepth: 2
-:caption: 模型解析
+:caption: 第四部分：多模态应用与实战
 
-model/qwen-vl
-model/intervl
-model/deepseek-r1
+applications/image_text
+applications/video_audio
+applications/digital_human
+applications/engineering
+applications/trends
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: 附录
+
+appendix/python_pytorch
+appendix/math_basics
+appendix/tools
+appendix/references
 ```
 
 ---
 
-### 进度概览
+## 进度概览
 
-| 分类 | 状态 |
-|------|------|
-| 分布式训练 | 📝 0/6 |
-| Transformer | 📝 0/6 |
-| 强化学习 | ✅ 1/2 (GRPO 已完成) |
-| 模型解析 | 📝 0/3 |
+| 部分 | 章节 | 状态 |
+|------|------|------|
+| 基础理论 | 大模型概述 / 深度学习基础 / 多模态基础 | 📝 0/3 |
+| 核心架构 | Transformer / 大模型设计 / 多模态架构 | 📝 0/3 |
+| 训练优化 | 数据准备 / 分布式训练 / RL对齐 / GRPO / 推理部署 | ✅ 1/5 (GRPO 已完成) |
+| 应用实战 | 图文 / 视频语音 / 数字人 / 工程实战 / 前沿趋势 | 📝 0/5 |
+| 附录 | Python/PyTorch / 数学基础 / 工具 / 参考资料 | 📝 0/4 |
 
-**总进度：1 / 17 已完成**
-
+**总进度：** 1 / 20 已完成
