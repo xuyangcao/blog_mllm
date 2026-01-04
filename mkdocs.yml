@@ -1,54 +1,13 @@
-site_name: 多模态与大模型技术原理
-site_description: 面向工程与研究的多模态与大模型技术书
-site_author: xuyang
+version: 2
 
-theme:
-  name: readthedocs
-  language: zh
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - navigation.top
-    - content.code.copy
-    - content.math
-  color_mode: dark
-  highlightjs: true
-  hljs_languages:
-    - yaml
-    - rust
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3"
 
-markdown_extensions:
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.highlight
-  - pymdownx.arithmatex:
-      generic: true
+sphinx:
+  configuration: docs/conf.py
 
-extra_javascript:
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-
-nav:
-  - 前言: index.md
-  - 分布式训练:
-    - 混合精度训练: dist/mixed_precision.md
-    - 梯度累积: dist/gradient_accumulation.md
-    - 流水线并行: dist/pipeline_parallel.md
-    - 数据并行: dist/data_parallel.md
-    - 模型并行: dist/model_parallel.md
-    - 并行训练优化: dist/parallel_training_optimization.md
-  - Transformer:
-    - Attention 机制: transformer/attention.md
-    - KV Cache 原理: transformer/kv_cache.md
-    - RoPE 原理: transformer/rope.md
-    - 位置编码: transformer/position_encoding.md
-    - 自注意力机制: transformer/self_attention.md
-    - 多头注意力机制: transformer/multi_head_attention.md
-    - 位置编码: transformer/position_encoding.md
-  - 强化学习:
-    - PPO 原理: RL/ppo.md
-    - GRPO 原理: RL/grpo.md
-  - 模型解析:
-    - Qwen-VL系列模型解析: model/qwen-vl.md
-    - InterVL系列模型解析: model/intervl.md
-    - DeepSeek系列模型解析: model/deepseek-r1.md
+python:
+  install:
+    - requirements: requirements.txt
