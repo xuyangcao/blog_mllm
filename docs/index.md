@@ -40,7 +40,7 @@ intro/multimodal_basics
 :caption: 第二部分：核心模型架构
 
 architecture/transformer
-architecture/transformer/position_encoding
+    architecture/transformer/position_encoding
 architecture/llm_design
 architecture/mllm_arch
 ```
