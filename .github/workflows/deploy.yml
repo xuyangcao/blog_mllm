@@ -1,22 +1,13 @@
-name: Deploy MkDocs
+version: 2
 
-on:
-  push:
-    branches:
-      - main
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3"
 
-permissions:
-  contents: write
+sphinx:
+  configuration: docs/conf.py
 
-jobs:
-  deploy:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - run: pip install mkdocs-material
-
-      - run: mkdocs gh-deploy --force
+python:
+  install:
+    - requirements: requirements.txt
