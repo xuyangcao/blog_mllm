@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="xuyang" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>GRPO 原理 - 多模态与大模型技术原理</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "GRPO \u539f\u7406";
+        var mkdocs_page_input_path = "RL/grpo.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/rust.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> 多模态与大模型技术原理
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">前言</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">分布式训练</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../dist/mixed_precision/">混合精度训练</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../dist/gradient_accumulation/">梯度累积</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../dist/pipeline_parallel/">流水线并行</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../dist/data_parallel/">数据并行</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../dist/model_parallel/">模型并行</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../dist/parallel_training_optimization/">并行训练优化</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transformer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/attention/">Attention 机制</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/kv_cache/">KV Cache 原理</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/rope/">RoPE 原理</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/position_encoding/">位置编码</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/self_attention/">自注意力机制</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/multi_head_attention/">多头注意力机制</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transformer/position_encoding/">位置编码</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">强化学习</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../ppo/">PPO 原理</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">GRPO 原理</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">公式回顾</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">深入理解</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-expectation">1. 最外层期望（Expectation）：在什么分布上进行优化？</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-token">2. 分组平均 &amp;&amp; Token平均：保持梯度稳定的同时拉齐不同序列长度的贡献</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-ppo-style-clipped-objective">3. PPO-style Clipped Objective</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-kl">4. KL 正则项（对齐 &amp;&amp; 防止遗忘）</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">伪代码</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">参考资料</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">模型解析</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../model/qwen-vl/">Qwen-VL系列模型解析</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../model/intervl/">InterVL系列模型解析</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../model/deepseek-r1/">DeepSeek系列模型解析</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">多模态与大模型技术原理</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">强化学习</li>
+      <li class="breadcrumb-item active">GRPO 原理</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="grpogroup-relative-policy-optimization">GRPO（Group Relative Policy Optimization）理解</h1>
+<p><strong>GRPO的核心思想可以简要理解为Grouped PPO。</strong></p>
+<p>也就是说，对同一个问题<span class="arithmatex">\(q\)</span>, 一次性采样一组（<span class="arithmatex">\(G\)</span> 个）完整回答，用组内相对优势（而不是 value baseline）来做 PPO-style 的 token 级策略更新，同时用KL正则把策略约束在参考模型附近。</p>
+<p>这里的Group指的就是分组；Relative指的就是组内相对优势。</p>
+<p><img alt="" src="../../assets/RL/grpo/GRPO_demo.png" /></p>
+<p>接下来，我想根据GRPO中涉及到的公式，和对应的伪代码，深入理解一下GRPO里面的细节；如果你对公式不感兴趣，那么可以直接跳过公式回顾和深入理解的部分。</p>
+<h2 id="_1">公式回顾</h2>
+<p>原文中公式如下：</p>
+<div class="arithmatex">\[
+\begin{aligned}
+\mathcal{J}_{G R P O}(\theta) &amp; =\mathbb{E}_{\left[q \sim P(Q),\left\{o_i\right\}_{i=1}^G \sim \pi_{\theta_{o l d}}(O \mid q)\right]} \\
+&amp; \frac{1}{G} \sum_{i=1}^G \frac{1}{\left|o_i\right|} \sum_{t=1}^{\left|o_i\right|}\left\{\min \left[\frac{\pi_\theta\left(o_{i, t} \mid q, o_{i,&lt;t}\right)}{\pi_{\theta_{o l d}}\left(o_{i, t} \mid q, o_{i,&lt;t}\right)} \hat{A}_{i, t}, \operatorname{clip}\left(\frac{\pi_\theta\left(o_{i, t} \mid q, o_{i,&lt;t}\right)}{\pi_{\theta_{o l d}}\left(o_{i, t} \mid q, o_{i,&lt;t}\right)}, 1-\varepsilon, 1+\varepsilon\right) \hat{A}_{i, t}\right]-\beta \mathbb{D}_{K L}\left[\pi_\theta| | \pi_{r e f}\right]\right\}
+\end{aligned}
+% \tag{1}
+\]</div>
+<p>我感觉作者省略了一对括号，对数学不好的同学不太友好，因此这里给它加上，长成这样：</p>
+<div class="arithmatex">\[
+\begin{aligned}
+\mathcal{J}_{\text{GRPO}}(\theta)
+&amp;= \mathbb{E}_{\left[q \sim P(Q), \{o_i\}_{i=1}^G \sim \pi_{\theta_{\text{old}}}(o|q)\right]} \Bigg[
+\frac{1}{G} \sum_{i=1}^G \frac{1}{|o_i|} \sum_{t=1}^{|o_i|}
+\Bigg\{
+\min \Bigg[
+\frac{\pi_\theta(o_{i,t}\mid q, o_{i,&lt;t})}
+{\pi_{\theta_{\text{old}}}(o_{i,t}\mid q, o_{i,&lt;t})}
+\hat{A}_{i,t},
+\\
+&amp;\quad\quad
+\operatorname{clip}\!\left(
+\frac{\pi_\theta(o_{i,t}\mid q, o_{i,&lt;t})}
+{\pi_{\theta_{\text{old}}}(o_{i,t}\mid q, o_{i,&lt;t})},
+1-\varepsilon, 1+\varepsilon
+\right)
+\hat{A}_{i,t}
+\Bigg]
+- \beta \, D_{\text{KL}}\!\left[\pi_\theta \,\|\, \pi_{\text{ref}}\right]
+\Bigg\}
+\Bigg]
+\end{aligned}
+\]</div>
+<p>整个 GRPO 目标函数 <span class="arithmatex">\(\mathcal{J}_{\text{GRPO}}(\theta)\)</span> 是一个期望收益（expected objective），即模型策略 <span class="arithmatex">\(\pi_\theta\)</span>在大量不同任务（prompts）和生成结果(responses)上的整体表现水平（由 group-normalized advantage 加权，并减去 KL 正则项表示）。</p>
+<p>因此，我们的目标是：通过调整 <span class="arithmatex">\(\theta\)</span>，让这个期望收益尽可能大。</p>
+<blockquote>
+<p>注：在实际训练中，为了兼容基于梯度下降的优化框架，通常做法是最小化其负值，即定义：
+$$
+\mathcal{L}<em>{\text{GRPO}}(\theta) = -\mathcal{J}</em>{\text{GRPO}}(\theta)
+$$
+并对 <span class="arithmatex">\(\mathcal{L}_{\text{GRPO}}(\theta)\)</span> 执行梯度下降。</p>
+</blockquote>
+<h2 id="_2">深入理解</h2>
+<h3 id="1-expectation">1. 最外层期望（Expectation）：在什么分布上进行优化？</h3>
+<div class="arithmatex">\[
+\mathbb{E}_{[q \sim P(Q), \{o_i\}_{i=1}^G \sim \pi_{\theta_{\text{old}}}(o|q)]}
+\]</div>
+<p>其中,
+<span class="arithmatex">\(q\)</span>表示一个 prompt（问题），从数据分布 <span class="arithmatex">\(P(Q)\)</span> 中采样， <span class="arithmatex">\(P(Q)\)</span>包含了不同类型的prompt，例如医学问题，VQA、报告生成等；
+<span class="arithmatex">\(\{o_i\}_{i=1}^G\)</span>表示对同一个 <span class="arithmatex">\(q\)</span>，用旧策略 <span class="arithmatex">\(\pi_{\theta_{\text{old}}}\)</span> 生成的 <strong>G 个输出（completions）</strong>.
+也就是说：<strong>对每个 prompt，我们并行生成 G 个回答，然后基于这些回答做优化</strong>. 这就是 GRPO 的“组内对比”思想.</p>
+<p>进一步理解，这个期望可以表示："如果我们从真实 prompt 分布中随机挑一个 <span class="arithmatex">\(q\)</span>，再用旧策略对它生成 <span class="arithmatex">\(G\)</span> 个随机回答，然后计算 GRPO loss，那么这个 loss 的平均值是多少?"，而我们的目标是：通过调整 <span class="arithmatex">\(\theta\)</span>（当前策略），让这个期望 loss 尽可能小。"</p>
+<blockquote>
+<p>这里我们通过监督学习来做个类比，监督学习的目标函数如下：</p>
+<div class="arithmatex">\[
+\mathcal{L}(\theta) = \mathbb{E}_{(x, y) \sim \mathcal{D}} \left[ \text{CrossEntropy}(f_\theta(x), y) \right]
+\]</div>
+<p>其中<span class="arithmatex">\(\mathcal{D}\)</span>表示训练数据分布，<span class="arithmatex">\((x, y)\)</span>表示一条样本（如图像+标签），CrossEntropy表示对这条样本计算的 loss。那么这个公式的整体含义可以表示为：在所有可能的数据上，模型预测的平均交叉熵损失。</p>
+<p>但我们无法计算真实期望（因为 <span class="arithmatex">\(\mathcal{D}\)</span> 未知），所以用 <strong>Monte Carlo 估计</strong>（即 mini-batch）：</p>
+<div class="arithmatex">\[
+\hat{\mathcal{L}}(\theta) \approx \frac{1}{N} \sum_{i=1}^N \text{CrossEntropy}(f_\theta(x_i), y_i)
+\]</div>
+<p>也就是说，<code>期望 = 理论目标，求和 = 实际近似</code>。回到 GRPO,完全一样的逻辑,对应关系如下：</p>
+<table>
+<thead>
+<tr>
+<th>监督学习</th>
+<th>GRPO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据分布 <span class="arithmatex">\(\mathcal{D}\)</span></td>
+<td>Prompt 分布 <span class="arithmatex">\(P(Q)\)</span> + 旧策略生成分布 <span class="arithmatex">\(\pi_{\theta_{\text{old}}}\)</span></td>
+</tr>
+<tr>
+<td>一条样本 <span class="arithmatex">\((x, y)\)</span></td>
+<td>一组数据 <span class="arithmatex">\((q, o_1, ..., o_G)\)</span></td>
+</tr>
+<tr>
+<td>Loss 函数（如 CE）</td>
+<td>PPO-style clipped objective + KL penalty</td>
+</tr>
+<tr>
+<td>期望 <span class="arithmatex">\(\mathbb{E}_{(x,y)\sim\mathcal{D}}[\text{loss}]\)</span></td>
+<td><span class="arithmatex">\(\mathbb{E}_{q, \{o_i\}}[\text{GRPO loss}]\)</span></td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<h3 id="2-token">2. 分组平均 &amp;&amp; Token平均：保持梯度稳定的同时拉齐不同序列长度的贡献</h3>
+<p>从下面的公式，可以看到这里有两层平均，外层平均表示对一个prompt产生的分组内部loss做平均，避免<span class="arithmatex">\(G\)</span>变大导致梯度爆炸；内层对token再平均，使得不同长度的回答被归一化到相同的尺度，防止模型生成更长的token来刷reward。</p>
+<div class="arithmatex">\[
+\frac{1}{G} \sum_{i=1}^G \frac{1}{|o_i|} \sum_{t=1}^{|o_i|} \left\{ \cdots \right\}
+\]</div>
+<p>具体地，对于每个 output <span class="arithmatex">\(o_i\)</span>：计算其每个 token <span class="arithmatex">\(t\)</span> 对应的 loss，其中<span class="arithmatex">\(|o_i|\)</span>表示<span class="arithmatex">\(o_i\)</span>的序列长度；
+然后对所有 token 取平均（<span class="arithmatex">\(\frac{1}{|o_i|}\)</span>）；
+再对所有 G 个 output 取平均（<span class="arithmatex">\(\frac{1}{G}\)</span>）。</p>
+<h3 id="3-ppo-style-clipped-objective">3. PPO-style Clipped Objective</h3>
+<p>接下来我们看一下大括号内部，实际上是新旧策略之间的token级重要性采样比(Importance Sampling Ration, ISR)和优势值(Advantage)的乘积，具体地：</p>
+<div class="arithmatex">\[
+\min \left[
+\frac{\pi_\theta(o_{i,t}|q, o_{i,&lt;t})}{\pi_{\theta_{\text{old}}}(o_{i,t}|q, o_{i,&lt;t})}
+\hat{A}_{i,t}, \,
+\text{clip}\left(
+\frac{\pi_\theta(o_{i,t}|q, o_{i,&lt;t})}{\pi_{\theta_{\text{old}}}(o_{i,t}|q, o_{i,&lt;t})}, 1-\varepsilon, 1+\varepsilon
+\right)
+\hat{A}_{i,t}
+\right]
+\]</div>
+<p>其中，<span class="arithmatex">\(\pi_{\theta}\)</span>表示当前待优化的策略模型（policy），
+<span class="arithmatex">\(\frac{\pi_\theta}{\pi_{\text{old}}}\)</span>为ISR，
+<span class="arithmatex">\(o_{i,t}\)</span>表示第 <span class="arithmatex">\(i\)</span> 个回答的第 <span class="arithmatex">\(t\)</span> 个 token，
+<span class="arithmatex">\(o_{i,&lt;t}\)</span>表示第 <span class="arithmatex">\(i\)</span> 个回答中第 <span class="arithmatex">\(t\)</span> 个 token 之前的前缀；
+<span class="arithmatex">\(\hat{A}_{i,t}\)</span>表示第 <span class="arithmatex">\(i\)</span> 个 output 中第 <span class="arithmatex">\(t\)</span> 个 token 的优势值；
+<code>clip(...)</code>限制了ISR 在 <span class="arithmatex">\([1-\varepsilon, 1+\varepsilon]\)</span> 范围内，防止策略更新过大；
+最终取 min，这是标准PPO 损失，用于稳定训练。</p>
+<p>接下来，我们还需要重点说明的是优势值的计算。<span class="arithmatex">\(\hat{A}_{i,t}\)</span>的计算方式如下：
+对每个 output <span class="arithmatex">\(o_i\)</span>，先计算其总 reward <span class="arithmatex">\(r_i\)</span>（如 accuracy、LLM judge 分数）；
+然后对组内 reward 做标准化：</p>
+<div class="arithmatex">\[
+\hat{A}_i = \frac{r_i - \mu_r}{\sigma_r + \epsilon}
+\]</div>
+<p>最后将 <span class="arithmatex">\(\hat{A}_i\)</span> 广播到该 output 的所有 token 上（即 <span class="arithmatex">\(\hat{A}_{i,t} = \hat{A}_i\)</span>）。这里<span class="arithmatex">\(\epsilon\)</span>用于保持数值稳定。</p>
+<h3 id="4-kl">4. KL 正则项（对齐 &amp;&amp; 防止遗忘）</h3>
+<div class="arithmatex">\[
+- \beta D_{\text{KL}}[\pi_\theta \| \pi_{\text{ref}}]
+\]</div>
+<p>其中，<span class="arithmatex">\(D_{\text{KL}}[\pi_\theta \| \pi_{\text{ref}}]\)</span>表示当前策略与参考模型（通常是 SFT 模型）之间的 KL 散度；<span class="arithmatex">\(\beta\)</span>为超参数，控制正则强度；减号表示：我们希望最小化这个 KL，即不让新策略偏离参考模型太远。最后，让我们看一下GRPO原文中对KL散度的定义：</p>
+<div class="arithmatex">\[
+\mathcal{D}_{KL}\left[\pi_\theta \mid\mid \pi_{\text{ref}}\right] = \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,&lt;t})}{\pi_\theta(o_{i,t} \mid q, o_{i,&lt;t})} - \log \frac{\pi_{\text{ref}}(o_{i,t} \mid q, o_{i,&lt;t})}{\pi_\theta(o_{i,t} \mid q, o_{i,&lt;t})} - 1
+\]</div>
+<h2 id="_3">伪代码</h2>
+<p>原始论文中算法流程：</p>
+<p><img alt="" src="../../assets/RL/grpo/GRPO_algorithm_1.png" /></p>
+<p>下面是我从ms-swift文档中摘抄的GRPO的伪代码，供大家理解。这里可以看到，代码中会在原始公式的整体加上负号，以最小化损失函数。</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ========== 1. Rollout Generation Phase ==========</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;Question: Which is bigger? 9.11 or 9.9?&quot;</span>
+
+<span class="c1"># Generate multiple completions through parallel sampling</span>
+<span class="n">completions</span> <span class="o">=</span> <span class="n">rollout_function</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">current_policy_model</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+    <span class="n">num_generations</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>  <span class="c1"># Hyperparameter: number of samples per prompt</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span>     <span class="c1"># Hyperparameter: sampling diversity</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">completions = [</span>
+<span class="sd">    (completion 1) &quot;The larger number is 9.11...&quot;,</span>
+<span class="sd">    (completion 2) &quot;9.9 is bigger than...&quot;,</span>
+<span class="sd">    ...</span>
+<span class="sd">    (completion 8) &quot;After calculation, 9.11...&quot;</span>
+<span class="sd">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># ========== 2. Reward Calculation Phase ==========</span>
+<span class="c1"># Evaluate generated completions using reward model</span>
+<span class="n">rewards</span> <span class="o">=</span> <span class="n">reward_function</span><span class="p">(</span>
+    <span class="n">completions</span><span class="o">=</span><span class="n">completions</span><span class="p">,</span>
+    <span class="n">ground_truth</span><span class="o">=</span><span class="s2">&quot;9.11&quot;</span>  <span class="c1"># Expected correct answer</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">rewards = [</span>
+<span class="sd">    (reward 1) 1.0,  # Correct answer</span>
+<span class="sd">    (reward 2) 0.0,  # Incorrect</span>
+<span class="sd">    ...</span>
+<span class="sd">    (reward 8) 1.0   # Correct</span>
+<span class="sd">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Normalize rewards to advantages</span>
+<span class="n">rewards_mean</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">rewards</span><span class="p">)</span>  <span class="c1"># μ = 0.5</span>
+<span class="n">rewards_std</span> <span class="o">=</span> <span class="n">std</span><span class="p">(</span><span class="n">rewards</span><span class="p">)</span>    <span class="c1"># σ = 0.25</span>
+<span class="n">advantages</span> <span class="o">=</span> <span class="p">(</span><span class="n">rewards</span> <span class="o">-</span> <span class="n">rewards_mean</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">rewards_std</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>  <span class="c1"># Standardization</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">advantages = [</span>
+<span class="sd">    (advantage 1)  2.0,  # (1.0 - 0.5)/0.25</span>
+<span class="sd">    (advantage 2) -2.0,</span>
+<span class="sd">    ...</span>
+<span class="sd">    (advantage 8)  2.0</span>
+<span class="sd">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># ========== 3. Policy Optimization Phase ==========</span>
+<span class="c1"># Get token-level log probabilities from different models</span>
+<span class="n">current_logps</span> <span class="o">=</span> <span class="n">get_per_token_logps</span><span class="p">(</span><span class="n">current_policy_model</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">completions</span><span class="p">)</span>  <span class="c1"># π_θ</span>
+<span class="n">old_logps</span> <span class="o">=</span> <span class="n">get_per_token_logps</span><span class="p">(</span><span class="n">old_policy_model</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">completions</span><span class="p">)</span>          <span class="c1"># π_θ_old</span>
+<span class="n">ref_logps</span> <span class="o">=</span> <span class="n">get_per_token_logps</span><span class="p">(</span><span class="n">reference_model</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">completions</span><span class="p">)</span>           <span class="c1"># π_ref</span>
+
+<span class="c1"># PPO Clipped Objective</span>
+<span class="n">is_ratio</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">current_logps</span> <span class="o">-</span> <span class="n">old_logps</span><span class="p">)</span>  <span class="c1"># Importance sampling ratio: e^(π_θ - π_θ_old)</span>
+<span class="n">clipped_ratio</span> <span class="o">=</span> <span class="n">clip</span><span class="p">(</span><span class="n">is_ratio</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="n">ε</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">ε</span><span class="p">)</span>   <span class="c1"># ε=0.2 typically</span>
+
+<span class="c1"># Policy gradient term (dual form)</span>
+<span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">mean</span><span class="p">(</span>
+    <span class="n">minimum</span><span class="p">(</span><span class="n">is_ratio</span> <span class="o">*</span> <span class="n">advantages</span><span class="p">,</span>       <span class="c1"># Unclipped objective</span>
+           <span class="n">clipped_ratio</span> <span class="o">*</span> <span class="n">advantages</span><span class="p">)</span>  <span class="c1"># Clipped objective</span>
+<span class="p">)</span>
+
+<span class="c1"># KL Divergence Penalty (K3 estimator)</span>
+<span class="c1"># KL(π_θ||π_ref) ≈ e^(logπ_ref - logπ_θ) - (logπ_ref - logπ_θ) - 1</span>
+<span class="n">kl_penalty</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">mean</span><span class="p">(</span>
+    <span class="n">exp</span><span class="p">(</span><span class="n">ref_logps</span> <span class="o">-</span> <span class="n">current_logps</span><span class="p">)</span> <span class="o">-</span>
+    <span class="p">(</span><span class="n">ref_logps</span> <span class="o">-</span> <span class="n">current_logps</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="p">)</span>
+
+<span class="c1"># Total Loss = Policy Loss + KL Penalty</span>
+<span class="n">total_loss</span> <span class="o">=</span> <span class="n">policy_loss</span> <span class="o">+</span> <span class="n">kl_penalty</span>
+
+<span class="c1"># ========== 4. Update Rule ==========</span>
+<span class="c1"># Apply gradient descent to minimize total_loss</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+<span class="n">total_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="_4">参考资料</h2>
+<ol>
+<li>DeepSeekMath: Pushing the Limits of Mathematical
+Reasoning in Open Language Models.(https://arxiv.org/pdf/2402.03300)</li>
+<li>https://swift.readthedocs.io/zh-cn/latest/Instruction/GRPO/GetStarted/GRPO.html</li>
+<li>Qwen &amp; ChatGPT</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ppo/" class="btn btn-neutral float-left" title="PPO 原理"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../model/qwen-vl/" class="btn btn-neutral float-right" title="Qwen-VL系列模型解析">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../ppo/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../model/qwen-vl/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
