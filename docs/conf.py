@@ -3,7 +3,7 @@
 # Project information
 project = '多模态大模型技术原理和实战'
 author = 'Xuyang Cao'
-copyright = '2026, Xuyang Cao'
+copyright = '2026, Xuyang Cao, newxuyang@gmail.com'
 
 # Extensions
 extensions = [
