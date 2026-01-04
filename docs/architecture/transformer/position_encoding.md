@@ -30,9 +30,12 @@ $$
 巧妙设计位置编码向量：
 对于每个token的位置编码向量，假设这个向量是$d$维，那么我把这个$d$维向量按顺序两两分组，组成$d/2$个复平面中的向量（也就是$\cos(\theta)+i \sin(\theta)）$。不同组别的向量如果在复平面上来表示，就可以理解为一个个角频率不同的旋转向量，如下图所示。图中，我们绘制了每个token的向量维度是6，那么可以组成3组旋转向量，并且维度越低的部分，角频率越高，转速越快。具体来说，公式中的$i$越小，$\theta$越大，因此转速越快。换怒话说，也就是转速蓝色>绿色>橙色。
 
+```{figure} ../../assets/architecture/transformer/position_encoding/position_encoding_demo.png
+:width: 500px
+:align: center
 
-![](../../assets/architecture/transformer/position_encoding/position_encoding_demo.png)
-图:绝对位置编码示意，通过在dimention维度上两两组合，位置向量可以转换为复平面内的旋转向量，因此携带了绝对位置信息。这个绝对位置信息后续会加到原始embedding中。
+绝对位置编码示意：通过在dimention维度上两两组合，位置向量可以转换为复平面内的旋转向量，因此携带了绝对位置信息。这个绝对位置信息后续会加到原始embedding中。
+```
 
 像不像时钟？蓝色是秒针，绿色是分针，橙色是时针。这样，我们就可以区分第一个token来自10点20分10秒，第二个token来自10点21分50秒，是不是给了每个向量一个绝对的位置？
 
@@ -40,11 +43,19 @@ $$
 
 > 注2：如果你不太理解为什么上述操作就可以用复平面中不同角频率的旋转向量表示，建议重温一下世界上最美的公式，欧拉公式。这里我放了两个图供理解。
 
-![](../../assets/architecture/transformer/position_encoding/Euler's_formula.svg.png)
-图：欧拉公式示意图
+```{figure} ../../assets/architecture/transformer/position_encoding/Euler's_formula.svg.png
+:width: 400px
+:align: center
 
-![](../../assets/architecture/transformer/position_encoding/Rising_circular.gif)
-图：欧拉公式示意图
+欧拉公式示意图
+```
+
+```{figure} ../../assets/architecture/transformer/position_encoding/Rising_circular.gif
+:width: 400px
+:align: center
+
+欧拉公式动态示意图
+```
 
 巧妙利用矩阵相乘：
 刚刚我们给每个token的embedding设计了一个位置编码，并且加到了原始的embedding中。那么通过自注意力运算之后，会出现什么呢？
@@ -56,19 +67,29 @@ $$\cos\theta_1\cos\theta_2+\sin\theta_1\sin\theta_2 =\cos(\theta_1 - \theta_2)$$
 其中$\theta_1$和$\theta_2$是不同位置处对应维度上的角度差，而这个角度差，就可以表示两个token之间的相对位置了。
 
 一个示例如下图所示：
-![](../../assets/architecture/transformer/position_encoding/pe.png)
+
+```{figure} ../../assets/architecture/transformer/position_encoding/pe.png
+:width: 700px
+:align: center
+
+位置编码矩阵点乘示例：通过和角公式构造相对位置信息
+```
+
 > 这里用到了三角函数中的和角公式，中学时代最头疼的公式之一。
 
 通过上述设计，我们就给每个token加上了一个绝对位置编码，同时通过attention中的矩阵点乘，我们还发现构造出了不同token之间的角度差，可以用作不同token之间的相对距离。
 
-关键点：
+## 关键点
+
 下面列出了我理解绝对位置编码过程中的一些关键信息
-1. **核心思想**：为序列中每个位置分配一个固定的、独立于上下文的正弦-余弦向量，让模型直接知道“这个 token 在第几号位置”。
+
+1. **核心思想**：为序列中每个位置分配一个固定的、独立于上下文的正弦-余弦向量，让模型直接知道"这个 token 在第几号位置"。
 2. **公式中变量的理解**：假设我们的一个序列embedding之后的维度是$(N, d)$，那么pos是$N$这个维度的变量，而$i$是$d$这个维度的变量。因此，随着$i$变大，三角函数的频率线性减小，并且由$d$来做归一化，使得频率的变化范围永远在[1/10000, 1]区间，这样不同的$d$也能具有相同的编码属性。
 3. **为什么奇偶位置要设计为正余弦**：这样的设计需要结合attention的点乘一起来看，通过$Q*K$点乘，结合PE的正余弦编码，可以构造一组组和角公式，也即$cos(A−B)=cosAcosB+sinAsinB$，这样我们可以在当前这个频率下来描述两个token之间的角度差，也就是相对距离。同时在$d$这个维度上，由于两两成组，假设$d$的维度是512，那么我们就可以用256个不同的频率，来描述token1和token2之间($N$维度)的相对距离。
 
 
-代码：
+## 代码
+
 ```python
 import math
 import torch
