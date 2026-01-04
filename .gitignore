@@ -1,4 +1,27 @@
+# MkDocs build output
 site/
+
+# Sphinx build output
+docs/_build/
+
+# Python
 __pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# macOS
 .DS_Store
-obsidian/
+
+# Obsidian
+.obsidian/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
