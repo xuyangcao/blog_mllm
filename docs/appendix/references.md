@@ -10,3 +10,4 @@
 
 ## D.4 社区与论坛
 
+1. [Looking Ahead to 2026](https://snscratchpad.com/posts/looking-ahead-2026/)
