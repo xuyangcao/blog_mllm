@@ -28,6 +28,14 @@
 
 ```{toctree}
 :maxdepth: 3
+:caption: 随笔
+
+posts/2026_0105
+```
+
+
+```{toctree}
+:maxdepth: 3
 :caption: 第一部分：基础理论与背景
 
 intro/llm_overview
