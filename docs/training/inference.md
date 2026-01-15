@@ -80,6 +80,23 @@ FlashAttention 的思想是把 attention 计算拆成块，并融合 softmax 与
 - 要长上下文 + 高并发：优先看 paged KV + continuous batching
 - 要极致低延迟：优先看算子融合与批处理策略
 - 要多模态：看视觉侧是否有高效路径（缓存、token 控制）
+
+---
+
+## 推理框架：vLLM（原理与使用）
+
+vLLM 是一个面向 LLM 推理服务的高性能框架，核心卖点通常来自两点：
+
+- **Paged KV Cache（PagedAttention）**：用分页/块管理 KV cache，减少碎片并提升并发下的显存利用率
+- **Continuous Batching**：在请求持续到达时动态拼 batch，提高 GPU 利用率与吞吐
+
+更完整的原理与使用方式见子章节。
+
+```{toctree}
+:maxdepth: 1
+
+inference/vllm
+```
 ## API 封装与部署方案
 
 把模型封装成服务时，建议把“模型能力”和“系统能力”分开设计：
