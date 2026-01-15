@@ -27,12 +27,12 @@
 ## 📚 内容目录
 
 ```{toctree}
-:maxdepth: 3
-:caption: 随笔
+:maxdepth: 2
+:caption: 前言与导读
 
-posts/2026_0105
+preface/positioning
+preface/engineering_research
 ```
-
 
 ```{toctree}
 :maxdepth: 3
@@ -59,7 +59,6 @@ architecture/mllm_arch
 training/data_preparation
 training/distributed
 training/rl_alignment
-training/grpo
 training/inference
 ```
 
@@ -67,21 +66,19 @@ training/inference
 :maxdepth: 3
 :caption: 第四部分：多模态应用与实战
 
-applications/image_text
-applications/video_audio
-applications/digital_human
-applications/engineering
-applications/trends
+applications/evidence_rag
+applications/form_extraction
+applications/image_retrieval
+applications/image_editing
+applications/video_summarization
 ```
 
 ```{toctree}
-:maxdepth: 3
-:caption: 附录
+:maxdepth: 2
+:caption: 随笔（阅读笔记 / 日常思考，与本书主线不直接相关）
 
-appendix/python_pytorch
-appendix/math_basics
-appendix/tools
-appendix/references
+posts/2026_0105
+posts/end2end_medical_model
 ```
 
 ---
@@ -90,10 +87,10 @@ appendix/references
 
 | 部分 | 章节 | 状态 |
 |------|------|------|
-| 基础理论 | 大模型概述 / 深度学习基础 / 多模态基础 | 📝 0/3 |
-| 核心架构 | Transformer / 大模型设计 / 多模态架构 | 📝 0/3 |
-| 训练优化 | 数据准备 / 分布式训练 / RL对齐 / GRPO / 推理部署 | ✅ 1/5 (GRPO 已完成) |
-| 应用实战 | 图文 / 视频语音 / 数字人 / 工程实战 / 前沿趋势 | 📝 0/5 |
-| 附录 | Python/PyTorch / 数学基础 / 工具 / 参考资料 | 📝 0/4 |
+| 前言与导读 | 书籍定位 / 工程与研究结合 | ✅ 2/2 |
+| 基础理论 | 大模型概述 / 深度学习基础 / 多模态基础 | ✅ 3/3 |
+| 核心架构 | Transformer / 大模型设计 / 多模态架构 | ✅ 3/3 |
+| 训练优化 | 数据准备 / 分布式训练 / RL对齐 / GRPO / 推理部署 | ✅ 4/5 (GRPO 已完成) |
+| 应用实战 | 证据化多模态RAG / 结构化抽取 / 图文检索 / 指令式图像编辑 / 视频摘要 | 📝 0/5 |
 
-**总进度：** 1 / 20 已完成
+**总进度：** 11 / 18 已完成
